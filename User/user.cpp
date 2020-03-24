@@ -179,7 +179,6 @@ int User::receive_message(){
         received_file<<buff;
         received_file.close();
     }
-    cout<<buff<<endl;
     return 0;
 }
 
