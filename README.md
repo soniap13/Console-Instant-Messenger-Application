@@ -1,2 +1,4 @@
 # Console-Instant-Messenger-Application
-Simple console application for Linux. Enabling creating conversation, joining it, sending messages and files
+->>>In linux terminal run messenger
+->>>To join conversation ./user <nickname> <port>
+(messenger is using port 8084, its hardcoded)
