@@ -25,22 +25,23 @@
 #include<fstream>
 
 class User{
-    public:
+    public: //private:
         std::string name;
-        bool is_connected;
         std::string ip_address;
         int socket_id;
         int conv_port;
+        int file_received;
         std::queue<std::string> files_to_send;
+
+    public:
+        bool is_connected;
 
         User();
         ~User();
-        friend class Server;
-        friend class Conversation;
 
         void run(std::string ip_address, int port);
         int send_message(std::string message);
-        int send_file();
+        void send_file();
         int receive_message();
         void set_name(std::string n);
 };

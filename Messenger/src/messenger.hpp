@@ -25,21 +25,21 @@
 #include<arpa/inet.h>
 
 class Conversation{
-    public:
+    public: //private;
         int user_socket;
         int user_listen_socket;
         std::list<int> connected_sockets;
-        bool is_connected;
-        int server_port;
+        int conv_port;
         std::list<pthread_t*> threads;
+
+        void send_message(std::string message);
+
+    public:
+        bool is_connected;
 
         Conversation(int port);
         ~Conversation();
-        friend class Server;
 
         int receive_message(int socket_id);
         void listen_to_user();
-        int send_message(std::string message);
-        //int send_file();
-        void print_info();
 };

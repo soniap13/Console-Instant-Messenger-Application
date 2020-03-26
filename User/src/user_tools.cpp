@@ -1,17 +1,7 @@
 #include "user.hpp"
-
 using namespace std;
 
 User me;
-
-void check(int val, string fun){
-    char temp[fun.length() + 1];
-    strcpy(temp, fun.c_str());
-    if(val < 0){
-        perror(temp);
-        exit(1);
-    }
-}
 
 User::User(){
     is_connected = false;
@@ -21,27 +11,31 @@ void User::run(string ip, int port){
     ip_address = ip;
     conv_port = port;
     unsigned int addr;
-    struct hostent *host;
-    struct sockaddr_in conversation;
+    hostent *host;
+    sockaddr_in conversation;
 
     socket_id = socket(AF_INET, SOCK_STREAM, 0);
-    check(socket_id, "User::run - socket()");
+    if(socket_id < 0){
+        perror("User::run - socket()");
+        return;
+    }
     addr = inet_addr(ip_address.c_str());
-    //check(addr, "User::run - inet_addr()");
+    if(addr = 0){
+        cout<<"Invalid ip address "<<ip_address<<endl;
+        return;
+    }
     host = gethostbyaddr((char*)&addr, sizeof(addr), AF_INET);
     if(host = nullptr){
         perror("User::run - gethostbyaddr()");
-        close(socket_id);
-        exit(1);
+        return;
     }
-    conversation.sin_addr.s_addr = 0; //inet_addr("178.43.72.211");//*((unsigned long*)host->h_addr);
+    conversation.sin_addr.s_addr = addr;
     conversation.sin_family = AF_INET;
     conversation.sin_port = htons(conv_port);
-    check(conversation.sin_port, "User::run - htons()");
-    if(connect(socket_id, (struct sockaddr*)&conversation, sizeof(conversation))){
+    if(connect(socket_id, (sockaddr*)&conversation, sizeof(conversation))){
         perror("User::run - connect()");
         close(socket_id);
-        exit(1);
+        return;
     }
     is_connected = true;
 }
@@ -72,8 +66,8 @@ int User::send_message(string message){
     return 0;
 }
 
-int User::send_file(){
-    if(files_to_send.size() == 0) return 0;
+void User::send_file(){
+    if(files_to_send.size() == 0) return;
 
     off_t offset = 0;
     struct stat stat_buf;
@@ -85,7 +79,7 @@ int User::send_file(){
         cout<<"Couldn't open file "<<file_name<<": "<<strerror(errno)<<endl;
         cout<<"Check file name/path/directory and try again"<<endl;
         files_to_send.pop();
-        return 0;
+        return;
     }
     fstat(fd, &stat_buf);
     long file_size = stat_buf.st_size;
@@ -104,7 +98,6 @@ int User::send_file(){
         cout<<"ERROR: "<<strerror(errno)<<endl;
     }
     files_to_send.pop();
-    return 0;
 }
 
 int get_name_type(const string &message, string &name, string &type){
@@ -155,8 +148,10 @@ int User::receive_message(){
     static string file_name;
     static int file_size, size_received;
     int rc = recv(socket_id, buff, 1024, 0);
+
     if(rc <= 0){
         cout<<"ERROR: conversation was closed"<<endl;
+        is_connected = false;
         return 1;
     }
     if(get_name_type(buff, nick, type) == 1){
@@ -188,7 +183,7 @@ void * receive_thread(void * p){
 }
 
 void * send_files_thread(void * p){
-    while(1)
+    while(me.is_connected)
         me.send_file();
 }
 

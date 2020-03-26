@@ -1,28 +1,24 @@
 #include "messenger_tools.cpp"
 
 int main(int argc, char* argv[]){
-    string buff;
     cout<<"Console instant Messenger Application"<<endl;
     cout<<"type \"close\" to close it"<<endl;
+
+    string buff;
+    pthread_t thread;
 
     if(conv.is_connected == false){
         cout<<"Couldn't connect to server"<<endl;
         getchar();
-        return 1;
+        return 0;
     }
-
-    pthread_t thread;
     pthread_create(&thread, NULL, &listen_thread, NULL);
     while(1){
         buff = "";
         getline(cin, buff);
         if(buff == "close") break;
-        /*
-        if(conv.send_message(buff)){
-            cout<<"Problem with connecting to server"<<endl;
-            break;
-        }
-        */
+        //conv.send_message(buff);
+
     }
     cout<<"Closing messenger..."<<endl;
     pthread_cancel(thread);
