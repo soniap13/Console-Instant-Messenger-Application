@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 3.10.2)
-project(messenger)
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
-set (CMAKE_CXX_FLAGS "-pthread")
-configure_file(messenger.hpp messenger.hpp)
-add_executable(messenger messenger.cpp)
-
+find_package(GTest REQUIRED)
+include_directories(${GTEST_INCLUDE_DIRS})
+add_executable(runTests tests.cpp)
+target_link_libraries(runTests ${GTEST_LIBRARIES} pthread)

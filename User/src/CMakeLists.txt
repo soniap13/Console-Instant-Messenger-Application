@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.10.2)
+project(user)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+set (CMAKE_CXX_FLAGS "-pthread")
+configure_file(user.hpp user.hpp)
+add_executable(user user_main.cpp)
